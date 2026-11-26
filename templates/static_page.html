@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="static-section">
+    <header class="section-header">
+        <h1 class="section-title">{{ page_heading }}</h1>
+        <p class="section-subtitle">{{ page_description }}</p>
+    </header>
+
+    <div class="card placeholder-card">
+        {% if page_key == 'publications' %}
+            <p>В этом разделе будут публиковаться статьи, методические разработки
+            и научные материалы нашего центра. Совсем скоро здесь появятся
+            первые публикации.</p>
+        {% elif page_key == 'certificates' %}
+            <p>После прохождения олимпиад и конкурсов вы сможете найти здесь
+            свои сертификаты и дипломы. Для получения сертификата необходимо
+            <a href="/register">зарегистрироваться</a> и принять участие
+            в мероприятии.</p>
+        {% elif page_key == 'preparation' %}
+            <p>Раздел для подготовки к олимпиадам. Здесь появятся тренировочные
+            задания, разбор задач, рекомендованная литература и полезные ссылки.</p>
+        {% elif page_key == 'regulations' %}
+            <p>Официальные положения о проведении олимпиад и конкурсов.
+            Документы регламентируют порядок участия, сроки, критерии оценки
+            и награждение победителей.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

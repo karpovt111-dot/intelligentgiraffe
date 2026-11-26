@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сертификат — {{ subject }} — {{ current_user.full_name }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, "Segoe UI", Georgia, serif;
+            background: #f5f0e4;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .cert {
+            width: 900px;
+            max-width: 100%;
+            aspect-ratio: 1.414 / 1;
+            background: #fffdf8;
+            border: 12px double #c9a227;
+            padding: 60px 70px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(139, 90, 43, 0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .cert::before {
+            content: "";
+            position: absolute;
+            inset: 12px;
+            border: 1px solid rgba(201, 162, 39, 0.4);
+            pointer-events: none;
+        }
+        .cert-gold { border-color: #c9a227; }
+        .cert-silver { border-color: #9ca3af; }
+        .cert-bronze { border-color: #b8763a; }
+
+        .cert-head {
+            text-align: center;
+        }
+        .cert-logo {
+            font-size: 48px;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+        .cert-brand {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #8b6f1e;
+        }
+        .cert-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #2c2c2c;
+            margin: 10px 0 4px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .cert-sub {
+            font-size: 14px;
+            color: #7a6b52;
+            letter-spacing: 0.15em;
+        }
+
+        .cert-body {
+            text-align: center;
+            padding: 24px 0;
+        }
+        .cert-to {
+            font-size: 14px;
+            color: #7a6b52;
+            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .cert-name {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2c2c2c;
+            font-style: italic;
+            border-bottom: 2px solid #e8d5b0;
+            padding-bottom: 12px;
+            margin-bottom: 22px;
+        }
+        .cert-reason {
+            font-size: 17px;
+            color: #5a5142;
+            line-height: 1.7;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        .cert-reason strong { color: #b8860b; }
+
+        .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 20px;
+        }
+        .cert-sign {
+            text-align: center;
+            flex: 1;
+        }
+        .cert-sign-line {
+            border-top: 1px solid #c9a227;
+            width: 180px;
+            margin: 0 auto 6px;
+            padding-top: 8px;
+            font-size: 13px;
+            color: #7a6b52;
+        }
+        .cert-date {
+            text-align: right;
+            font-size: 13px;
+            color: #7a6b52;
+        }
+        .cert-medal {
+            position: absolute;
+            right: 50px;
+            top: 40px;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5d76e, #b8860b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
+        }
+        .cert-silver .cert-medal {
+            background: linear-gradient(135deg, #d1d5db, #9ca3af);
+            box-shadow: 0 6px 20px rgba(156, 163, 175, 0.4);
+        }
+        .cert-bronze .cert-medal {
+            background: linear-gradient(135deg, #d4a373, #b8763a);
+            box-shadow: 0 6px 20px rgba(184, 118, 58, 0.4);
+        }
+
+        .cert-actions {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 10px;
+        }
+        .cert-actions a,
+        .cert-actions button {
+            padding: 10px 20px;
+            background: #f5a623;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .cert-actions a { background: #7a6b52; }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .cert { box-shadow: none; width: 100%; }
+            .cert-actions { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cert-actions">
+    <a href="/profile">← В профиль</a>
+    <button onclick="window.print()">🖨️ Скачать PDF</button>
+</div>
+
+<div class="cert cert-{{ level }} cert-medal-{{ level }}">
+    <div class="cert-medal">
+        {% if level == 'gold' %}🥇{% elif level == 'silver' %}🥈{% else %}🥉{% endif %}
+    </div>
+
+    <div class="cert-head">
+        <div class="cert-logo">🦒</div>
+        <div class="cert-brand">Интеллектуальный жирафик</div>
+        <div class="cert-title">Сертификат</div>
+        <div class="cert-sub">{{ level_label }}</div>
+    </div>
+
+    <div class="cert-body">
+        <div class="cert-to">Награждается</div>
+        <div class="cert-name">{{ current_user.full_name }}</div>
+        <div class="cert-reason">
+            за успешное прохождение олимпиады<br>
+            по предмету <strong>«{{ subject }}»</strong>
+            {% if grade %}для <strong>{{ grade }} класса</strong>{% endif %}<br>
+            с результатом <strong>{{ percent }}%</strong>
+            ({{ correct }} из {{ total }} правильных ответов)
+        </div>
+    </div>
+
+    <div class="cert-footer">
+        <div class="cert-sign">
+            <div class="cert-sign-line">Оргкомитет</div>
+        </div>
+        <div class="cert-date">
+            Выдан {{ date }}<br>
+            ID: {{ filename }}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

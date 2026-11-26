@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title or "Интеллектуальный жирафик" }} — Интеллектуальный жирафик</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦒</text></svg>">
+</head>
+<body>
+<header class="site-header">
+    <div class="header-top">
+        <a href="/" class="site-brand">
+            <span class="brand-emoji">🦒</span>
+            <span class="brand-text">Интеллектуальный жирафик</span>
+        </a>
+        <div class="header-actions">
+            <button type="button" class="theme-toggle" id="themeToggle" title="Сменить тему">
+                <span class="theme-icon">🌙</span>
+            </button>
+            {% if current_user %}
+                <a href="/profile" class="user-badge" title="Перейти в профиль">
+                    <span class="user-avatar">{{ current_user.username[0]|upper }}</span>
+                    <span class="user-name">{{ current_user.username }}</span>
+                </a>
+                <form method="post" action="/logout" class="logout-form">
+                    <button type="submit" class="btn btn-outline btn-sm">Выйти</button>
+                </form>
+            {% else %}
+                <a href="/login" class="btn btn-outline btn-sm">Войти</a>
+                <a href="/register" class="btn btn-primary btn-sm">Зарегистрироваться</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <a href="/olympiads" class="nav-link {% if page_title == 'Олимпиады' %}active{% endif %}">Олимпиады</a>
+        <a href="/courses" class="nav-link {% if page_title == 'Курсы' %}active{% endif %}">Курсы</a>
+        <a href="/publications" class="nav-link {% if page_title == 'Публикации' %}active{% endif %}">Публикации</a>
+
+        <div class="dropdown">
+            <button type="button" class="nav-link dropdown-toggle">
+                Другое <span class="caret">▾</span>
+            </button>
+            <div class="dropdown-menu">
+                <a href="/certificates" class="dropdown-item">Сертификаты</a>
+                <a href="/preparation" class="dropdown-item">Подготовка к олимпиадам</a>
+                <a href="/regulations" class="dropdown-item">Положения мероприятий</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <p>© 2025 Интеллектуальный жирафик. Все права защищены.</p>
+</footer>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>

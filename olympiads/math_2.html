@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Математика — 1 класс</title>
+<script>
+  // Применяем тему ДО отрисовки, чтобы не было "вспышки"
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (e) {}
+  })();
+</script>
+<style>
+  /* ===================== ТЕМЫ ===================== */
+  :root, [data-theme="light"] {
+    --primary: #f5a623;
+    --primary-dark: #d68910;
+    --primary-soft: #fff7e6;
+    --primary-line: #f0d9a8;
+    --bg: #faf7f0;
+    --bg-alt: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f5f0e4;
+    --text: #1c1a15;
+    --text-2: #5a5142;
+    --muted: #8e8575;
+    --border: #ebe2cf;
+    --border-strong: #d9cfb7;
+    --danger: #d9534f;
+    --success: #2f855a;
+  }
+  [data-theme="dark"] {
+    --primary: #f5b43d;
+    --primary-dark: #e09a2b;
+    --primary-soft: #2f2618;
+    --primary-line: #4a3a1f;
+    --bg: #100e0a;
+    --bg-alt: #181510;
+    --surface: #1a1712;
+    --surface-2: #221d15;
+    --text: #f5edd9;
+    --text-2: #c9bfa8;
+    --muted: #8f8672;
+    --border: #2a241a;
+    --border-strong: #3d3526;
+    --danger: #ff6b66;
+    --success: #6ee07a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: var(--surface); border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; }
+  .brand-emoji { font-size: 22px; }
+  .brand-title { font-size: 15px; color: var(--text-2); font-weight: 600; }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    width: 40px; height: 40px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .theme-toggle:hover { background: var(--primary-soft); transform: scale(1.05); }
+
+  .theme-toggle .theme-icon-dark { display: none; }
+  .theme-toggle .theme-icon-light { display: inline; }
+  [data-theme="dark"] .theme-toggle .theme-icon-dark { display: inline; }
+  [data-theme="dark"] .theme-toggle .theme-icon-light { display: none; }
+
+  .timer {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 16px; background: var(--primary-soft); border: 1.5px solid var(--primary-line);
+    border-radius: 999px; font-weight: 800; font-size: 17px; color: var(--primary-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .timer.warning { background: var(--primary-soft); }
+  .timer.danger { background: rgba(217, 83, 79, 0.1); color: var(--danger); border-color: var(--danger); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+  .progress-info { font-size: 14px; font-weight: 700; color: var(--text-2); }
+  .progress-bar { height: 4px; background: var(--border); }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); width: 0%; transition: width 0.3s; }
+
+  .stage { flex: 1; display: flex; justify-content: center; padding: 40px 24px 220px; }
+  .card {
+    width: 100%; max-width: 720px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 40px 44px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.06);
+    align-self: flex-start;
+  }
+
+  .q-num {
+    display: inline-block; padding: 4px 12px; background: var(--primary-soft); color: var(--primary-dark);
+    font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    border-radius: 999px; margin-bottom: 16px;
+  }
+  .q-title { font-size: 22px; font-weight: 800; margin-bottom: 22px; line-height: 1.35; color: var(--text); }
+  .q-hint {
+    font-size: 15px; color: var(--text-2); margin-bottom: 18px;
+    padding: 12px 16px; background: var(--bg); border-left: 3px solid var(--primary);
+    border-radius: 4px;
+  }
+  .q-answer-label { font-size: 13px; font-weight: 700; color: var(--text-2); margin-bottom: 8px; display: block; }
+  .q-input {
+    width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 16px; font-family: inherit; background: var(--bg); color: var(--text);
+    transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .q-input:focus { outline: none; border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(245,166,35,0.15); }
+  .q-input::placeholder { color: var(--muted); }
+
+  .multi-fields { display: flex; flex-direction: column; gap: 14px; }
+  .field-row { display: flex; flex-direction: column; gap: 6px; }
+  .field-label { font-size: 13px; font-weight: 700; color: var(--text-2); }
+
+  .nums-bar {
+    position: fixed; left: 0; right: 0; bottom: 76px;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 10px 16px; z-index: 60;
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    max-height: 110px; overflow-y: auto;
+  }
+  .num-dot {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-2);
+    font-size: 13px; font-weight: 800; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border 0.15s, color 0.15s, transform 0.1s;
+    font-family: inherit; flex: 0 0 auto;
+  }
+  .num-dot:hover { border-color: var(--primary); transform: translateY(-1px); }
+  .num-dot.answered { background: var(--primary-soft); border-color: var(--primary-line); color: var(--primary-dark); }
+  .num-dot.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-color: var(--primary-dark); color: #fff;
+    box-shadow: 0 3px 10px rgba(245,166,35,0.4);
+  }
+
+  .nav-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
+    border-top: 1px solid var(--border); box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; z-index: 70;
+  }
+  .btn {
+    padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 700;
+    cursor: pointer; border: 1.5px solid transparent; font-family: inherit;
+    transition: transform 0.1s, box-shadow 0.15s, background 0.15s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 14px rgba(245,166,35,0.35); }
+  .btn-outline { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+  .btn-outline:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-dark); }
+  .btn-finish { background: linear-gradient(135deg, #2b7a2b, #1f5a1f); color: #fff; box-shadow: 0 4px 14px rgba(43,122,43,0.35); }
+
+  .finish-screen { text-align: center; padding: 40px 20px; }
+  .finish-emoji { font-size: 80px; margin-bottom: 16px; }
+  .finish-title { font-size: 30px; font-weight: 900; margin-bottom: 12px; letter-spacing: -0.02em; color: var(--text); }
+  .finish-text { font-size: 16px; color: var(--text-2); max-width: 520px; margin: 0 auto 24px; }
+
+  .finish-stats { display: flex; justify-content: center; gap: 32px; margin: 30px 0; flex-wrap: wrap; }
+  .finish-stat { text-align: center; }
+  .finish-stat-value { font-size: 36px; font-weight: 900; color: var(--primary-dark); line-height: 1; }
+  .finish-stat-value.good { color: var(--success); }
+  .finish-stat-value.bad  { color: var(--danger); }
+  .finish-stat-label { font-size: 13px; color: var(--muted); margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .review-list { text-align: left; margin: 30px 0; max-height: 400px; overflow-y: auto; padding-right: 4px; }
+  .review-item {
+    padding: 14px 16px; border-radius: 10px; margin-bottom: 10px;
+    background: var(--bg); border-left: 4px solid var(--border);
+  }
+  .review-item.correct { border-left-color: var(--success); background: rgba(47,133,90,0.06); }
+  .review-item.wrong { border-left-color: var(--danger); background: rgba(217,83,79,0.06); }
+  .review-q { font-weight: 700; color: var(--text); font-size: 14px; margin-bottom: 4px; }
+  .review-your { font-size: 13px; color: var(--text-2); }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none;
+    align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 16px; padding: 32px; max-width: 420px; width: 100%;
+    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    color: var(--text);
+  }
+  .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+  .modal-text { font-size: 15px; color: var(--text-2); margin-bottom: 24px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+  .award-box {
+    max-width: 520px; margin: 0 auto 24px; text-align: left;
+    background: var(--primary-soft); border: 1px solid var(--primary-line); border-radius: 12px; padding: 18px 20px;
+  }
+  .award-title { font-weight: 800; font-size: 15px; color: var(--primary-dark); margin-bottom: 8px; }
+  .award-price { font-size: 13px; color: var(--text-2); margin-bottom: 12px; }
+
+  @media (max-width: 640px) {
+    .topbar { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+    .brand-title { display: none; }
+    .timer { font-size: 15px; padding: 6px 12px; }
+    .theme-toggle { width: 36px; height: 36px; font-size: 15px; }
+    .card { padding: 28px 22px; }
+    .q-title { font-size: 19px; }
+    .nav-bar { padding: 10px 14px; }
+    .btn { padding: 10px 16px; font-size: 14px; }
+    .finish-title { font-size: 24px; }
+    .stage { padding-bottom: 240px; }
+    .nums-bar { bottom: 64px; max-height: 96px; padding: 8px 10px; }
+    .num-dot { width: 30px; height: 30px; font-size: 12px; }
+  }
+  @media print { body { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-emoji">🦒</span>
+    <span>Интеллектуальный жирафик</span>
+    <span class="brand-title">· Математика, 1 класс</span>
+  </div>
+  <div class="topbar-right">
+    <div class="progress-info" id="progressInfo">Задание 1 из 10</div>
+    <button type="button" class="theme-toggle" id="themeToggle" title="Сменить тему">
+      <span class="theme-icon-light">🌙</span>
+      <span class="theme-icon-dark">☀️</span>
+    </button>
+    <div class="timer" id="timer">⏱ 01:00:00</div>
+  </div>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-bar-fill" id="progressFill"></div>
+</div>
+
+<div class="stage">
+  <div class="card" id="card"></div>
+</div>
+
+<div class="nav-bar" id="navBar">
+  <button type="button" class="btn btn-outline" id="prevBtn" disabled>← Назад</button>
+  <button type="button" class="btn btn-primary" id="nextBtn">Далее →</button>
+</div>
+
+<div class="nums-bar" id="numsBar"></div>
+
+<div class="modal-backdrop" id="finishModal">
+  <div class="modal">
+    <div class="modal-title">Завершить олимпиаду?</div>
+    <div class="modal-text">
+      После завершения вы не сможете изменить ответы.
+      Убедитесь, что ответили на все задания.
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-outline" id="cancelFinish">Отмена</button>
+      <button type="button" class="btn btn-finish" id="confirmFinish">Завершить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ============================================================
+  // ТЕМА
+  // ============================================================
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      const root = document.documentElement;
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        root.removeAttribute('data-theme');
+        try { localStorage.setItem('theme', 'light'); } catch (e) {}
+      } else {
+        root.setAttribute('data-theme', 'dark');
+        try { localStorage.setItem('theme', 'dark'); } catch (e) {}
+      }
+    });
+  }
+
+  // ============================================================
+  // ЗАЩИТА ОТ КОПИРОВАНИЯ
+  // ============================================================
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('copy', e => e.preventDefault());
+  document.addEventListener('cut', e => e.preventDefault());
+  document.addEventListener('selectstart', e => {
+    if (!e.target.matches('input, textarea')) e.preventDefault();
+  });
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && ['c','x','a','u','s','p'].includes(e.key.toLowerCase())) {
+      e.preventDefault(); return false;
+    }
+    if (e.key === 'F12' ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()))) {
+      e.preventDefault(); return false;
+    }
+  });
+
+  // ============================================================
+  // ЗАДАНИЯ (10 интересных)
+  // ============================================================
+  const QUESTIONS = [ // 2 класс
+      {
+        title: 'Секретное число',
+        text: 'Я задумал число. Если его удвоить и вычесть 5, получится 11. Какое число я задумал?',
+        placeholder: 'Введите число',
+        answer: '8',
+        keywords: ['8']
+      },
+      {
+        title: 'Пропущенное вычитаемое',
+        text: 'В выражении 14 − ? = 9 пропущено число. Какое?',
+        placeholder: 'Введите число',
+        answer: '5',
+        keywords: ['5']
+      },
+      {
+        title: 'Поровну',
+        text: 'У Пети 9 наклеек, у Вани 3. Сколько наклеек Петя должен отдать Ване, чтобы у них стало поровну?',
+        placeholder: 'Введите число',
+        answer: '3',
+        keywords: ['3']
+      },
+      {
+        title: 'Соседние числа',
+        text: 'Сумма двух соседних чисел равна 13. Какие это числа?',
+        fields: [
+          { label: '1-е число', placeholder: 'Введите число', keywords: ['6'] },
+          { label: '2-е число', placeholder: 'Введите число', keywords: ['7'] }
+        ]
+      },
+      {
+        title: 'Числовая лесенка',
+        text: 'Продолжи ряд: 3, 6, 9, 12, ... Какое число идёт дальше?',
+        placeholder: 'Введите число',
+        answer: '15',
+        keywords: ['15']
+      },
+      {
+        title: 'Который час?',
+        text: 'Часовая стрелка смотрит на 6, а минутная — на 12. Который час?',
+        placeholder: 'Например: 1:00',
+        answer: '6:00',
+        keywords: ['6']
+      },
+      {
+        title: 'Сколько колёс?',
+        text: 'У одного велосипеда 2 колеса. Сколько колёс у трёх велосипедов?',
+        placeholder: 'Введите число',
+        answer: '6',
+        keywords: ['6']
+      },
+      {
+        title: 'Периметр',
+        text: 'Чему равен периметр квадрата со стороной 3 см?',
+        placeholder: 'Введите число (в см)',
+        answer: '12',
+        keywords: ['12']
+      },
+      {
+        title: 'Хитрый счёт',
+        text: 'Сколько раз цифра 2 встречается в числах от 1 до 20?',
+        placeholder: 'Введите число',
+        answer: '3',
+        keywords: ['3']
+      },
+      {
+        title: 'Прямоугольник и квадрат',
+        text: 'Сколько всего квадратов можно увидеть в прямоугольнике 2×3 (в клетку), если считать и большие, и маленькие?',
+        placeholder: 'Введите число',
+        answer: '8',
+        keywords: ['8']
+    }
+  ];
+
+  const TOTAL = QUESTIONS.length;
+  const DURATION = 60 * 60; // 1 час
+
+  let currentIndex = 0;
+  let answers = new Array(TOTAL).fill('');
+  let timeLeft = DURATION;
+  let timerInterval = null;
+  let finished = false;
+
+  const STORAGE_KEY = 'giraffic_math_1_answers';
+  const STORAGE_TIME = 'giraffic_math_1_time';
+
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) answers = JSON.parse(s);
+    const t = localStorage.getItem(STORAGE_TIME);
+    if (t) {
+      const p = parseInt(t, 10);
+      if (!isNaN(p) && p > 0 && p < DURATION) timeLeft = p;
+    }
+  } catch (e) {}
+
+  const card = document.getElementById('card');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressInfo = document.getElementById('progressInfo');
+  const progressFill = document.getElementById('progressFill');
+  const timerEl = document.getElementById('timer');
+  const finishModal = document.getElementById('finishModal');
+  const cancelFinish = document.getElementById('cancelFinish');
+  const confirmFinish = document.getElementById('confirmFinish');
+  const navBar = document.getElementById('navBar');
+  const numsBar = document.getElementById('numsBar');
+
+  // ============================================================
+  // ПРОВЕРКА ОТВЕТА
+  // ============================================================
+  function norm(s) {
+    return String(s).toLowerCase().replace(/ё/g, 'е').trim();
+  }
+
+  function checkAnswer(userVal, q) {
+    if (q.fields) {
+      const arr = Array.isArray(userVal) ? userVal : [];
+      return q.fields.every(function (f, i) {
+        const v = arr[i] ? norm(arr[i]) : '';
+        if (!v) return false;
+        return f.keywords.every(function (kw) {
+          return v.includes(norm(kw));
+        });
+      });
+    }
+    const v = typeof userVal === 'string' ? norm(userVal) : '';
+    if (!v) return false;
+    return q.keywords.every(function (kw) { return v.includes(norm(kw)); });
+  }
+
+  // ============================================================
+  // ОПРЕДЕЛЕНИЕ НАГРАДЫ
+  // ============================================================
+  function getAward(correct, total) {
+    const pct = correct / total * 100;
+    if (pct >= 100) return { key: 'diploma1', title: 'Диплом I степени',   price: 150 };
+    if (pct >= 90)  return { key: 'diploma2', title: 'Диплом II степени',  price: 150 };
+    if (pct >= 80)  return { key: 'diploma3', title: 'Диплом III степени', price: 150 };
+    return             { key: 'cert',     title: 'Сертификат участника', price: 100 };
+  }
+
+  // ============================================================
+  // РЕНДЕР
+  // ============================================================
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function render() {
+    if (finished) return;
+    const q = QUESTIONS[currentIndex];
+
+    let answerHtml = '';
+    if (q.fields) {
+      const vals = Array.isArray(answers[currentIndex]) ? answers[currentIndex] : new Array(q.fields.length).fill('');
+      answerHtml = '<div class="multi-fields">' + q.fields.map(function (f, i) {
+        return `
+          <div class="field-row">
+            <label class="field-label">${escapeHtml(f.label)}</label>
+            <input type="text" class="q-input" data-field-index="${i}"
+                   placeholder="${escapeHtml(f.placeholder)}"
+                   value="${escapeHtml(vals[i] || '')}"
+                   autocomplete="off">
+          </div>`;
+      }).join('') + '</div>';
+    } else {
+      const val = typeof answers[currentIndex] === 'string' ? answers[currentIndex] : '';
+      answerHtml = `
+        <label class="q-answer-label">Ваш ответ:</label>
+        <input type="text" class="q-input" id="answerInput"
+               placeholder="${escapeHtml(q.placeholder || '')}"
+               value="${escapeHtml(val)}"
+               autocomplete="off" autofocus>`;
+    }
+
+    card.innerHTML = `
+      <div class="q-num">Задание ${currentIndex + 1} из ${TOTAL}</div>
+      <h2 class="q-title">${escapeHtml(q.title)}</h2>
+      <p class="q-hint">${escapeHtml(q.text)}</p>
+      ${answerHtml}
+    `;
+
+    if (q.fields) {
+      const inputs = card.querySelectorAll('.q-input');
+      const ensureArr = function () {
+        if (!Array.isArray(answers[currentIndex])) {
+          answers[currentIndex] = new Array(q.fields.length).fill('');
+        }
+        return answers[currentIndex];
+      };
+      inputs.forEach(function (inp) {
+        inp.addEventListener('input', function () {
+          ensureArr()[parseInt(inp.dataset.fieldIndex, 10)] = inp.value;
+          saveAnswers();
+          updateNumsBar();
+        });
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentIndex < TOTAL - 1) goTo(currentIndex + 1);
+            else openFinishModal();
+          }
+        });
+      });
+    } else {
+      const input = document.getElementById('answerInput');
+      input.addEventListener('input', function () {
+        answers[currentIndex] = input.value;
+        saveAnswers();
+        updateNumsBar();
+      });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (currentIndex < TOTAL - 1) goTo(currentIndex + 1);
+          else openFinishModal();
+        }
+      });
+    }
+
+    prevBtn.disabled = currentIndex === 0;
+    if (currentIndex === TOTAL - 1) {
+      nextBtn.textContent = 'Завершить';
+      nextBtn.classList.remove('btn-primary');
+      nextBtn.classList.add('btn-finish');
+    } else {
+      nextBtn.textContent = 'Далее →';
+      nextBtn.classList.remove('btn-finish');
+      nextBtn.classList.add('btn-primary');
+    }
+    progressInfo.textContent = `Задание ${currentIndex + 1} из ${TOTAL}`;
+    progressFill.style.width = ((currentIndex + 1) / TOTAL * 100) + '%';
+    updateNumsBar();
+  }
+
+  function isAnswered(i) {
+    const q = QUESTIONS[i];
+    const v = answers[i];
+    if (q.fields) {
+      if (!Array.isArray(v)) return false;
+      return v.some(function (x) { return x && x.trim(); });
+    }
+    return typeof v === 'string' && v.trim() !== '';
+  }
+
+  function buildNumsBar() {
+    if (!numsBar || numsBar.children.length) return;
+    for (let i = 0; i < TOTAL; i++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'num-dot';
+      b.dataset.index = i;
+      b.textContent = i + 1;
+      b.addEventListener('click', function () { goTo(parseInt(b.dataset.index, 10)); });
+      numsBar.appendChild(b);
+    }
+  }
+
+  function updateNumsBar() {
+    if (!numsBar) return;
+    buildNumsBar();
+    const dots = numsBar.children;
+    for (let i = 0; i < dots.length; i++) {
+      const d = dots[i];
+      d.classList.toggle('active', i === currentIndex);
+      d.classList.toggle('answered', isAnswered(i));
+    }
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= TOTAL) return;
+    currentIndex = index;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function saveAnswers() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(answers)); } catch (e) {}
+  }
+
+  // ============================================================
+  // ТАЙМЕР
+  // ============================================================
+  function formatTime(s) {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return [h, m, sec].map(v => String(v).padStart(2, '0')).join(':');
+  }
+  function updateTimer() {
+    timerEl.textContent = '⏱ ' + formatTime(timeLeft);
+    timerEl.classList.remove('warning', 'danger');
+    if (timeLeft <= 300) timerEl.classList.add('danger');
+    else if (timeLeft <= 1800) timerEl.classList.add('warning');
+  }
+  function startTimer() {
+    updateTimer();
+    timerInterval = setInterval(function () {
+      timeLeft--;
+      try { localStorage.setItem(STORAGE_TIME, String(timeLeft)); } catch (e) {}
+      updateTimer();
+      if (timeLeft <= 0) { clearInterval(timerInterval); finish(true); }
+    }, 1000);
+  }
+
+  // ============================================================
+  // ЗАВЕРШЕНИЕ + ПЕРЕХОД НА ОПЛАТУ
+  // ============================================================
+  function openFinishModal() { finishModal.classList.add('show'); }
+  function closeFinishModal() { finishModal.classList.remove('show'); }
+
+  function formatUserAnswer(val, q) {
+    if (q.fields) {
+      if (!Array.isArray(val)) return '— не отвечено —';
+      const parts = q.fields.map(function (f, i) {
+        return f.label + ': ' + (val[i] && val[i].trim() ? val[i] : '—');
+      });
+      return parts.join('; ');
+    }
+    return (typeof val === 'string' && val.trim()) ? val : '— не отвечено —';
+  }
+
+  function finish(timeUp) {
+    if (finished) return;
+    finished = true;
+    clearInterval(timerInterval);
+
+    let correct = 0;
+    const review = [];
+    QUESTIONS.forEach(function (q, i) {
+      const ok = checkAnswer(answers[i], q);
+      if (ok) correct++;
+      review.push({
+        title: q.title,
+        your: formatUserAnswer(answers[i], q),
+        ok: ok
+      });
+    });
+
+    const pct = Math.round(correct / TOTAL * 100);
+    const award = getAward(correct, TOTAL);
+    const emoji = timeUp ? '⏰' : (pct >= 80 ? '🎉' : pct >= 50 ? '👍' : '🙂');
+
+    card.innerHTML = `
+      <div class="finish-screen">
+        <div class="finish-emoji">${emoji}</div>
+        <h1 class="finish-title">${timeUp ? 'Время вышло!' : 'Олимпиада завершена!'}</h1>
+        <p class="finish-text">Ваш результат: <b>${correct} из ${TOTAL}</b> (${pct}%).</p>
+
+        <div class="finish-stats">
+          <div class="finish-stat">
+            <div class="finish-stat-value good">${correct}</div>
+            <div class="finish-stat-label">правильно</div>
+          </div>
+          <div class="finish-stat">
+            <div class="finish-stat-value bad">${TOTAL - correct}</div>
+            <div class="finish-stat-label">ошибок</div>
+          </div>
+          <div class="finish-stat">
+            <div class="finish-stat-value">${pct}%</div>
+            <div class="finish-stat-label">результат</div>
+          </div>
+        </div>
+
+        <div class="award-box">
+          <div class="award-title">Вам доступен: ${award.title}</div>
+          <div class="award-price">Стоимость: ${award.price} ₽</div>
+          <button id="buyBtn" class="btn btn-primary" style="width:100%;justify-content:center;">
+            Купить «${award.title}» за ${award.price} ₽
+          </button>
+        </div>
+
+        <h3 style="font-size:18px;font-weight:800;margin:32px 0 14px;text-align:left;">Разбор ответов</h3>
+        <div class="review-list">
+          ${review.map((r, i) => `
+            <div class="review-item ${r.ok ? 'correct' : 'wrong'}">
+              <div class="review-q">${i + 1}. ${escapeHtml(r.title)}</div>
+              <div class="review-your">Ваш ответ: ${escapeHtml(r.your)}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <a href="/olympiads" class="btn btn-outline" style="margin-top:16px;">← К списку олимпиад</a>
+      </div>
+    `;
+
+    if (navBar) navBar.style.display = 'none';
+    if (numsBar) numsBar.style.display = 'none';
+
+    document.getElementById('buyBtn').addEventListener('click', function () {
+      const fd = new FormData();
+      fd.append('filename', 'math_1.html');
+      fd.append('correct', correct);
+      fd.append('total', TOTAL);
+
+      fetch('/olympiads/submit', {
+        method: 'POST',
+        body: fd,
+        credentials: 'same-origin'
+      })
+      .then(() => {
+        window.location.href = `/olympiads/buy?filename=math_1.html&correct=${correct}&total=${TOTAL}`;
+      })
+      .catch(function (e) {
+        console.warn('Не удалось сохранить результат:', e);
+        window.location.href = `/olympiads/buy?filename=math_1.html&correct=${correct}&total=${TOTAL}`;
+      });
+    });
+  }
+
+  // ============================================================
+  // СОБЫТИЯ
+  // ============================================================
+  prevBtn.addEventListener('click', () => { if (currentIndex > 0) goTo(currentIndex - 1); });
+  nextBtn.addEventListener('click', () => {
+    if (currentIndex < TOTAL - 1) goTo(currentIndex + 1);
+    else openFinishModal();
+  });
+  cancelFinish.addEventListener('click', closeFinishModal);
+  confirmFinish.addEventListener('click', () => { closeFinishModal(); finish(false); });
+  window.addEventListener('beforeunload', function (e) {
+    if (!finished) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  buildNumsBar();
+  render();
+  startTimer();
+})();
+</script>
+</body>
+</html>

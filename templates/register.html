@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h1 class="auth-title">Регистрация</h1>
+        <p class="auth-subtitle">Все поля обязательны для заполнения.</p>
+
+        {% if errors %}
+            <div class="alert alert-error">
+                {% for e in errors %}<div>{{ e }}</div>{% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="/register" class="auth-form" id="registerForm">
+            <input type="hidden" name="next" value="{{ next or '/' }}">
+
+            <label class="form-label">ФИО</label>
+            <input class="form-input" type="text" name="full_name"
+                   value="{{ full_name or '' }}" required minlength="2" maxlength="100"
+                   placeholder="Иванов Иван Иванович">
+
+            <label class="form-label">Ник</label>
+            <input class="form-input" type="text" name="username"
+                   value="{{ username or '' }}" required minlength="3" maxlength="30"
+                   pattern="[A-Za-z0-9_]+"
+                   title="Только латиница, цифры и подчёркивание"
+                   placeholder="ivan_2005">
+
+            <label class="form-label">E-mail (для входа)</label>
+            <input class="form-input" type="email" name="email"
+                   value="{{ email or '' }}" required
+                   placeholder="ivan@example.com">
+
+            <div class="form-row">
+                <div>
+                    <label class="form-label">Класс</label>
+                    <select class="form-input" name="grade" required>
+                        {% for g in range(1, 12) %}
+                            <option value="{{ g }}" {% if grade == g %}selected{% endif %}>
+                                {{ g }} класс
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Дата рождения</label>
+                    <div class="date-wrapper">
+                        <input class="form-input" type="text" name="birth_date"
+                               id="birthDateInput"
+                               value="{{ birth_date or '' }}" required
+                               inputmode="numeric"
+                               maxlength="10"
+                               autocomplete="off">
+                        <span class="date-hint" id="dateHint">дд.мм.гггг</span>
+                    </div>
+                    <div id="birthDateError" class="field-error" style="display:none;"></div>
+                </div>
+            </div>
+
+            <label class="form-label">Пароль</label>
+            <input class="form-input" type="password" name="password" required minlength="6">
+
+            <label class="form-label">Повторите пароль</label>
+            <input class="form-input" type="password" name="password_confirm" required minlength="6">
+
+            <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+        </form>
+
+        <p class="auth-footer">
+            Уже есть аккаунт? <a href="/login?next={{ next or '/' }}">Войти</a>
+        </p>
+    </div>
+</section>
+
+<style>
+    .field-error {
+        margin-top: 6px;
+        color: #d9534f;
+        font-size: 13px;
+    }
+    .form-input.input-invalid {
+        border-color: #d9534f;
+        box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.15);
+    }
+
+    /* Обёртка для поля с подсказкой */
+    .date-wrapper {
+        position: relative;
+    }
+
+    /* Подсказка "дд.мм.гггг" — на фоне поля, не выделяется мышкой */
+    .date-hint {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b8a888;
+        font-size: 15px;
+        pointer-events: none;    /* клики/выделение проходят сквозь */
+        user-select: none;       /* нельзя выделить текст */
+        -webkit-user-select: none;
+        opacity: 1;
+        transition: opacity 0.15s ease;
+    }
+    .date-hint.hidden {
+        opacity: 0;
+    }
+</style>
+
+<script>
+(function () {
+    var input = document.getElementById('birthDateInput');
+    var errorBox = document.getElementById('birthDateError');
+    var hint = document.getElementById('dateHint');
+    var form = document.getElementById('registerForm');
+    if (!input) return;
+
+    var MIN_AGE = 5;
+    var MAX_AGE = 20;
+
+    function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = 'block';
+        input.classList.add('input-invalid');
+    }
+
+    function clearError() {
+        errorBox.textContent = '';
+        errorBox.style.display = 'none';
+        input.classList.remove('input-invalid');
+    }
+
+    function toggleHint() {
+        if (input.value.length === 0) {
+            hint.classList.remove('hidden');
+        } else {
+            hint.classList.add('hidden');
+        }
+    }
+
+    function formatFromDigits(digits) {
+        if (digits.length > 8) digits = digits.slice(0, 8);
+        var out = '';
+        if (digits.length >= 1) out += digits.slice(0, 2);
+        if (digits.length >= 3) out += '.' + digits.slice(2, 4);
+        if (digits.length >= 5) out += '.' + digits.slice(4, 8);
+        return out;
+    }
+
+    function getDigits() {
+        return input.value.replace(/\D/g, '');
+    }
+
+    function validate() {
+        clearError();
+        var digits = getDigits();
+        if (digits.length === 0) return true;
+
+        // ---- День ----
+        if (digits.length >= 1) {
+            var d1 = parseInt(digits[0], 10);
+            if (d1 > 3) {
+                digits = '0' + digits;
+                input.value = formatFromDigits(digits);
+                showError('День должен быть от 01 до 31.');
+                return false;
+            }
+        }
+        if (digits.length >= 2) {
+            var day = parseInt(digits.slice(0, 2), 10);
+            if (day < 1 || day > 31) {
+                showError('День должен быть от 01 до 31.');
+                return false;
+            }
+        }
+
+        // ---- Месяц ----
+        if (digits.length >= 3) {
+            var m1 = parseInt(digits[2], 10);
+            if (m1 > 1) {
+                digits = digits.slice(0, 2) + '0' + digits.slice(2);
+                input.value = formatFromDigits(digits);
+                showError('Месяц должен быть от 01 до 12.');
+                return false;
+            }
+        }
+        if (digits.length >= 4) {
+            var month = parseInt(digits.slice(2, 4), 10);
+            if (month < 1 || month > 12) {
+                showError('Месяц должен быть от 01 до 12.');
+                return false;
+            }
+        }
+
+        // ---- Год и возраст (только когда 8 цифр) ----
+        if (digits.length === 8) {
+            var day = parseInt(digits.slice(0, 2), 10);
+            var month = parseInt(digits.slice(2, 4), 10);
+            var year = parseInt(digits.slice(4, 8), 10);
+
+            // Реальная дата (например, 31.02 не существует)
+            var test = new Date(year, month - 1, day);
+            if (test.getFullYear() !== year ||
+                test.getMonth() !== month - 1 ||
+                test.getDate() !== day) {
+                showError('Такой даты не существует. Проверьте день и месяц.');
+                return false;
+            }
+
+            // ---- Проверка года: не в будущем ----
+            var today = new Date();
+            if (year > today.getFullYear()) {
+                showError('Год рождения не может быть в будущем.');
+                return false;
+            }
+            if (year === today.getFullYear()) {
+                // Родиться в этом году — значит возраст 0, точно < 5
+                showError('Возраст должен быть не меньше ' + MIN_AGE + ' лет.');
+                return false;
+            }
+
+            // ---- Возраст от 5 до 20 ----
+            var age = today.getFullYear() - year;
+            var mDiff = today.getMonth() - (month - 1);
+            if (mDiff < 0 || (mDiff === 0 && today.getDate() < day)) {
+                age--;
+            }
+
+            if (age < MIN_AGE) {
+                showError('Возраст должен быть не меньше ' + MIN_AGE + ' лет.');
+                return false;
+            }
+            if (age > MAX_AGE) {
+                showError('Возраст должен быть не больше ' + MAX_AGE + ' лет.');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    input.addEventListener('input', function () {
+        var digits = getDigits();
+        input.value = formatFromDigits(digits);
+        toggleHint();
+        validate();
+    });
+
+    input.addEventListener('focus', toggleHint);
+    input.addEventListener('blur', toggleHint);
+
+    input.addEventListener('keydown', function (e) {
+        var allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+        if (allowed.indexOf(e.key) !== -1) return;
+        if (!/^\d$/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    // Стартовое состояние подсказки
+    toggleHint();
+
+    // Финальная проверка при отправке
+    form.addEventListener('submit', function (e) {
+        var digits = getDigits();
+        if (digits.length !== 8) {
+            e.preventDefault();
+            showError('Введите полную дату рождения: 8 цифр (дд.мм.гггг).');
+            input.focus();
+            return;
+        }
+        if (!validate()) {
+            e.preventDefault();
+            input.focus();
+        }
+    });
+})();
+</script>
+{% endblock %}

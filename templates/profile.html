@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-page">
+
+    {% if success_message %}
+        <div class="alert alert-success">{{ success_message }}</div>
+    {% endif %}
+    {% if error_message %}
+        <div class="alert alert-error">{{ error_message }}</div>
+    {% endif %}
+
+    <div class="profile-hero">
+        <div class="profile-hero-avatar">{{ current_user.full_name[0]|upper }}</div>
+        <div class="profile-hero-info">
+            <h1 class="profile-hero-name">{{ current_user.full_name }}</h1>
+            <div class="profile-hero-nick">@{{ current_user.username }}</div>
+            <div class="profile-hero-badges">
+                <span class="profile-badge profile-badge-grade">{{ current_user.grade }} класс</span>
+                <span class="profile-badge">🦒 с нами {{ days_with_us }} дн.</span>
+                <span class="profile-badge profile-badge-streak">🔥 серия {{ stats.streak_days }} дн.</span>
+            </div>
+        </div>
+        <div class="profile-hero-cta">
+            <a href="#settings" class="btn btn-outline">⚙️ Настройки</a>
+        </div>
+    </div>
+
+    <div class="profile-stats-grid">
+        <div class="profile-stat-card">
+            <span class="profile-stat-icon">🏆</span>
+            <div class="profile-stat-value">{{ stats.olympiads_done }}</div>
+            <div class="profile-stat-label">олимпиад пройдено</div>
+        </div>
+        <div class="profile-stat-card">
+            <span class="profile-stat-icon">✅</span>
+            <div class="profile-stat-value">{{ stats.tasks_solved }}</div>
+            <div class="profile-stat-label">задач решено</div>
+        </div>
+        <div class="profile-stat-card">
+            <span class="profile-stat-icon">🔥</span>
+            <div class="profile-stat-value">{{ stats.streak_days }}</div>
+            <div class="profile-stat-label">дней подряд</div>
+        </div>
+        <div class="profile-stat-card">
+            <span class="profile-stat-icon">📚</span>
+            <div class="profile-stat-value">{{ available_count }}</div>
+            <div class="profile-stat-label">доступно олимпиад</div>
+        </div>
+    </div>
+
+    <div class="profile-tabs" id="settings">
+        <button class="profile-tab active" data-tab="olympiads">🏆 Олимпиады</button>
+        <button class="profile-tab" data-tab="courses">🎓 Курсы</button>
+        <button class="profile-tab" data-tab="portfolio">🎖️ Портфолио</button>
+        <button class="profile-tab" data-tab="achievements">🏅 Достижения</button>
+        <button class="profile-tab" data-tab="info">📇 Данные</button>
+        <button class="profile-tab" data-tab="security">🔐 Пароль</button>
+    </div>
+
+    <!-- ТАБ: ОЛИМПИАДЫ -->
+    <div class="profile-tab-content active" id="tab-olympiads">
+        <div class="profile-block">
+            <h2 class="profile-block-title">Пройденные олимпиады</h2>
+            {% if passed_olympiads %}
+                <div class="results-table">
+                    {% for p in passed_olympiads %}
+                        <div class="result-row {% if p.passed %}result-passed{% else %}result-failed{% endif %}">
+                            <div class="result-icon">
+                                {% if p.percent >= 90 %}🥇
+                                {% elif p.percent >= 70 %}🥈
+                                {% elif p.passed %}🥉
+                                {% else %}📄{% endif %}
+                            </div>
+                            <div class="result-info">
+                                <div class="result-title">
+                                    {{ p.subject }}{% if p.grade %} — {{ p.grade }} класс{% endif %}
+                                </div>
+                                <div class="result-date">
+                                    {{ p.completed_at.strftime('%d.%m.%Y в %H:%M') }}
+                                </div>
+                            </div>
+                            <div class="result-score">
+                                <span class="result-percent">{{ p.percent }}%</span>
+                                <span class="result-fraction">{{ p.correct }}/{{ p.total }}</span>
+                            </div>
+                            <div class="result-actions">
+                                {% if p.passed %}
+                                    <a href="/certificate/{{ p.filename }}" class="btn btn-sm btn-primary">🎖️ Сертификат</a>
+                                {% else %}
+                                    <span class="result-locked">нужно 50%+</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🏆</div>
+                    <p>Вы ещё не проходили олимпиады. <a href="/olympiads">Начать первую →</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ТАБ: КУРСЫ -->
+    <div class="profile-tab-content" id="tab-courses">
+        <div class="profile-block">
+            <h2 class="profile-block-title">Пройденные курсы</h2>
+            {% if courses_passed %}
+                <div class="courses-grid">
+                    {% for c in courses_passed %}
+                        <a href="/courses/view/{{ c.filename }}" class="course-card">
+                            <div class="course-icon">🎓</div>
+                            <div class="course-body">
+                                <div class="course-title">{{ c.title }}</div>
+                                <div class="course-meta">
+                                    Начат {{ c.first_visited_at.strftime('%d.%m.%Y') }}
+                                    · {{ c.visits }} визит{{ 'а' if c.visits in (2,3,4) else ('ов' if c.visits > 4 else '') }}
+                                </div>
+                            </div>
+                            <div class="course-arrow">→</div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🎓</div>
+                    <p>Вы ещё не открывали курсы. <a href="/courses">Посмотреть курсы →</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ТАБ: ПОРТФОЛИО -->
+    <div class="profile-tab-content" id="tab-portfolio">
+        <div class="profile-block">
+            <h2 class="profile-block-title">Портфолио · Сертификаты</h2>
+            {% if certificates %}
+                <div class="certificates-grid">
+                    {% for cert in certificates %}
+                        <a href="/certificate/{{ cert.filename }}" class="certificate-card cert-{{ 'gold' if cert.percent >= 90 else ('silver' if cert.percent >= 70 else 'bronze') }}">
+                            <div class="certificate-medal">
+                                {% if cert.percent >= 90 %}🥇
+                                {% elif cert.percent >= 70 %}🥈
+                                {% else %}🥉{% endif %}
+                            </div>
+                            <div class="certificate-subject">{{ cert.subject }}</div>
+                            <div class="certificate-grade">{{ cert.grade }} класс</div>
+                            <div class="certificate-percent">{{ cert.percent }}%</div>
+                            <div class="certificate-date">{{ cert.date.strftime('%d.%m.%Y') }}</div>
+                            <div class="certificate-action">Открыть сертификат →</div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🎖️</div>
+                    <p>Пока нет сертификатов. Пройдите олимпиаду на 50%+ чтобы получить первый!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ТАБ: ДОСТИЖЕНИЯ -->
+    <div class="profile-tab-content" id="tab-achievements">
+        <div class="profile-block">
+            <h2 class="profile-block-title">Ваши достижения</h2>
+            {% if achievements %}
+                <div class="achievements-grid">
+                    {% for a in achievements %}
+                        <div class="achievement-card">
+                            <span class="achievement-icon">{{ a.icon }}</span>
+                            <div class="achievement-title">{{ a.title }}</div>
+                            <div class="achievement-desc">{{ a.desc }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🏅</div>
+                    <p>Пока нет достижений. Пройдите олимпиаду, чтобы получить первое!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ТАБ: ЛИЧНЫЕ ДАННЫЕ -->
+    <div class="profile-tab-content" id="tab-info">
+        <div class="profile-block">
+            <h2 class="profile-block-title">Личные данные</h2>
+            <form method="post" action="/profile/update" class="auth-form">
+                <div class="form-row">
+                    <div>
+                        <label class="form-label">ФИО</label>
+                        <input class="form-input" type="text" name="full_name"
+                               value="{{ current_user.full_name }}" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Ник</label>
+                        <input class="form-input" type="text" name="username"
+                               value="{{ current_user.username }}" required
+                               pattern="[A-Za-z0-9_]{3,30}">
+                    </div>
+                </div>
+
+                <label class="form-label">E-mail</label>
+                <input class="form-input" type="email" name="email"
+                       value="{{ current_user.email }}" required>
+
+                <div class="form-row">
+                    <div>
+                        <label class="form-label">Класс</label>
+                        <select class="form-input" name="grade" required>
+                            {% for g in range(1, 12) %}
+                                <option value="{{ g }}" {% if current_user.grade == g %}selected{% endif %}>
+                                    {{ g }} класс
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Дата рождения</label>
+                        <input class="form-input" type="text" name="birth_date"
+                               value="{{ birth_str }}" required
+                               placeholder="дд.мм.гггг">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ТАБ: БЕЗОПАСНОСТЬ -->
+    <div class="profile-tab-content" id="tab-security">
+        <div class="profile-block">
+            <h2 class="profile-block-title">Смена пароля</h2>
+            <form method="post" action="/profile/password" class="auth-form">
+                <label class="form-label">Текущий пароль</label>
+                <input class="form-input" type="password" name="old_password" required>
+
+                <label class="form-label">Новый пароль</label>
+                <input class="form-input" type="password" name="new_password"
+                       required minlength="6">
+
+                <label class="form-label">Повторите новый пароль</label>
+                <input class="form-input" type="password" name="new_password_confirm"
+                       required minlength="6">
+
+                <button type="submit" class="btn btn-primary">Сменить пароль</button>
+            </form>
+        </div>
+    </div>
+
+</section>
+
+<script>
+    (function () {
+        var tabs = document.querySelectorAll('.profile-tab');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                tabs.forEach(function (t) { t.classList.remove('active'); });
+                document.querySelectorAll('.profile-tab-content').forEach(function (c) {
+                    c.classList.remove('active');
+                });
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        var bd = document.querySelector('input[name="birth_date"]');
+        if (bd) {
+            bd.addEventListener('input', function () {
+                var digits = bd.value.replace(/\D/g, '').slice(0, 8);
+                var out = '';
+                if (digits.length >= 1) out += digits.slice(0, 2);
+                if (digits.length >= 3) out += '.' + digits.slice(2, 4);
+                if (digits.length >= 5) out += '.' + digits.slice(4, 8);
+                bd.value = out;
+            });
+        }
+    })();
+</script>
+{% endblock %}

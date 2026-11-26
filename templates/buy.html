@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Покупка награды — Интеллектуальный жирафик{% endblock %}
+
+{% block content %}
+<section class="list-section">
+    <header class="section-header">
+        <h1 class="section-title">Покупка награды</h1>
+        <p class="section-subtitle">Проверьте награду и оплатите её.</p>
+    </header>
+
+    <div class="card" style="display:flex; flex-direction:column; align-items:center; gap:20px; padding:32px;">
+
+        <!-- Предпросмотр: размытый, без возможности сохранить/выделить -->
+        <div class="preview-wrap">
+            <img
+                src="/olympiads/preview.png?filename={{ filename }}&correct={{ correct }}&total={{ total }}"
+                alt="Предпросмотр награды (размыт до оплаты)"
+                class="preview-img blurred"
+                draggable="false"
+            >
+            <div class="preview-note">Предпросмотр скрыт до оплаты</div>
+        </div>
+
+        <!-- Стоимость -->
+        <div style="font-size:20px; font-weight:800; color:#d68910;">
+            Стоимость: {{ price }} ₽
+        </div>
+
+        <!-- Кнопка: пока скачивает PDF без оплаты.
+             Позже заменить на редирект в ЮKassa + выдачу PDF после вебхука -->
+        <form method="post" action="/olympiads/pay" style="margin:0;">
+            <input type="hidden" name="filename" value="{{ filename }}">
+            <input type="hidden" name="correct" value="{{ correct }}">
+            <input type="hidden" name="total" value="{{ total }}">
+            <button type="submit" class="btn btn-primary">
+                Оплатить и скачать PDF
+            </button>
+        </form>
+
+        <a href="/olympiads" class="btn btn-outline">← К списку олимпиад</a>
+    </div>
+</section>
+
+<style>
+  .preview-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 320px;
+    width: 100%;
+  }
+
+  .preview-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid #ebe2cf;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    background: #fff;
+  }
+
+  /* Блюр + защита от случайного сохранения/выделения */
+  .preview-img.blurred {
+    filter: blur(6px);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Плашка поверх размытой картинки */
+  .preview-note {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(28, 26, 21, 0.75);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+</style>
+{% endblock %}

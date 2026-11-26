@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-eyebrow">🦒 Платформа олимпиад нового поколения</div>
+        <h1 class="hero-title">
+            Учись играя.<br>
+            Побеждай с <span class="brand-highlight">Жирафиком</span>.
+        </h1>
+        <p class="hero-subtitle">
+            Более <strong>15 000</strong> школьников уже проверили себя
+            на 41 олимпиаде по пяти предметам — от математики до информатики.
+            Присоединяйтесь: это бесплатно и без скучных форм.
+        </p>
+
+        {% if current_user %}
+            <div class="hero-actions">
+                <a href="/olympiads" class="btn btn-primary btn-lg">🏆 К олимпиадам</a>
+                <a href="/profile" class="btn btn-outline btn-lg">👤 Мой профиль</a>
+            </div>
+        {% else %}
+            <div class="hero-actions">
+                <a href="/register" class="btn btn-primary btn-lg">Начать бесплатно</a>
+                <a href="/login" class="btn btn-outline btn-lg">Войти</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-value">15</div>
+            <div class="hero-stat-label">олимпиад</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">5</div>
+            <div class="hero-stat-label">предметов</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">1–11</div>
+            <div class="hero-stat-label">классы</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">15 000+</div>
+            <div class="hero-stat-label">участников</div>
+        </div>
+    </div>
+</section>
+
+<section class="section-how">
+    <h2 class="section-heading">Как это работает</h2>
+    <p class="section-lead">Три шага от регистрации до первого диплома</p>
+    <div class="how-grid">
+        <div class="how-card">
+            <span class="how-number">1</span>
+            <span class="how-icon">📝</span>
+            <h3>Зарегистрируйтесь</h3>
+            <p>Укажите ФИО, ник и класс — займёт 30 секунд и ничего не стоит.</p>
+        </div>
+        <div class="how-card">
+            <span class="how-number">2</span>
+            <span class="how-icon">🎯</span>
+            <h3>Выберите олимпиаду</h3>
+            <p>Доступны олимпиады для вашего класса и старше — по пяти предметам.</p>
+        </div>
+        <div class="how-card">
+            <span class="how-number">3</span>
+            <span class="how-icon">🏆</span>
+            <h3>Получите результат</h3>
+            <p>Мгновенная проверка, разбор ошибок и сертификат участника.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section-features">
+    <h2 class="section-heading">Почему «Интеллектуальный жирафик»?</h2>
+    <p class="section-lead">Всё, чтобы учиться было интересно и честно</p>
+    <div class="features">
+        <div class="feature-card">
+            <span class="feature-icon">🏆</span>
+            <h3>15 олимпиад</h3>
+            <p>Математика, русский, английский, информатика — 1–11 классы.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">⚡</span>
+            <h3>Мгновенная проверка</h3>
+            <p>Не нужно ждать неделю — результат сразу после отправки.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🎓</span>
+            <h3>Для любого класса</h3>
+            <p>Задания с 1 по 11 класс — каждому по силам и интересам.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🔒</span>
+            <h3>Честно и безопасно</h3>
+            <p>Пароли шифруются, данные не передаются третьим лицам.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section-testimonials">
+    <h2 class="section-heading">Отзывы участников</h2>
+    <p class="section-lead">Что говорят те, кто уже прошёл не одну олимпиаду</p>
+    <div class="testimonials-grid">
+        <div class="testimonial-card">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg,#f5a623,#d68910);">М</div>
+            <p class="testimonial-text">«Прошёл олимпиаду по физике. Задания реально интересные.»</p>
+            <div class="testimonial-author">Максим, 9 класс</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg,#4285f4,#2563eb);">А</div>
+            <p class="testimonial-text">«Наконец-то олимпиады, где не надо ждать результат неделями. И тёмная тема — приятно!»</p>
+            <div class="testimonial-author">Алина, 7 класс</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg,#2b7a2b,#1f5a1f);">Д</div>
+            <p class="testimonial-text">«Мой класс участвует всем составом. Учительница довольна, дети в восторге.»</p>
+            <div class="testimonial-author">Дмитрий, 5 класс</div>
+        </div>
+    </div>
+</section>
+
+{% if not current_user %}
+<section class="cta-final">
+    <h2>Готовы проверить себя?</h2>
+    <p>Регистрация занимает 30 секунд и ничего не стоит.</p>
+    <a href="/register" class="btn btn-primary btn-lg">Начать бесплатно →</a>
+</section>
+{% endif %}
+
+{% endblock %}

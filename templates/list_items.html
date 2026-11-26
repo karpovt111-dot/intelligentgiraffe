@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="list-section">
+    <header class="section-header">
+        <h1 class="section-title">{{ section_title }}</h1>
+        <p class="section-subtitle">{{ section_description }}</p>
+    </header>
+
+    {% if error_message %}
+        <div class="alert alert-error">{{ error_message }}</div>
+    {% endif %}
+
+    {% if not current_user %}
+        <div class="alert alert-info">
+            Чтобы открыть материал, необходимо
+            <a href="/login?next=/{{ section }}">войти</a> или
+            <a href="/register?next=/{{ section }}">зарегистрироваться</a>.
+        </div>
+    {% endif %}
+
+    {% if items %}
+        <div class="items-grid">
+            {% for item in items %}
+                {% if item.passed %}
+                    <div class="item-card item-card-disabled" title="Вы уже проходили эту олимпиаду">
+                        <div class="item-icon">✅</div>
+                        <div class="item-body">
+                            <h3 class="item-title">{{ item.title }}</h3>
+                            {% if item.grade %}
+                                <span class="grade-badge grade-badge-passed">{{ item.grade }} класс · пройдено</span>
+                            {% else %}
+                                <span class="grade-badge grade-badge-passed">пройдено</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% elif item.available %}
+                    <a class="item-card" href="/{{ section }}/view/{{ item.filename }}">
+                        <div class="item-icon">
+                            {% if section == 'olympiads' %}🏆{% else %}🎓{% endif %}
+                        </div>
+                        <div class="item-body">
+                            <h3 class="item-title">{{ item.title }}</h3>
+                            {% if item.grade %}
+                                <span class="grade-badge">{{ item.grade }} класс</span>
+                            {% endif %}
+                        </div>
+                        <div class="item-arrow">→</div>
+                    </a>
+                {% else %}
+                    <div class="item-card item-card-disabled" title="{{ item.reason }}">
+                        <div class="item-icon">🔒</div>
+                        <div class="item-body">
+                            <h3 class="item-title">{{ item.title }}</h3>
+                            {% if item.grade %}
+                                <span class="grade-badge grade-badge-locked">{{ item.grade }} класс</span>
+                            {% endif %}
+                            <p class="item-reason">{{ item.reason }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🦒</div>
+            <p>Пока здесь пусто. Материалы появятся совсем скоро.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
