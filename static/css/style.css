@@ -1569,38 +1569,58 @@ html[data-theme="dark"] a.user-badge:hover {
     border-color: #2f4a33;
 }
 
-/* --- Подвал --- */
+/* --- Обновленный подвал --- */
 .site-footer {
     background: var(--surface);
     border-top: 1px solid var(--border);
-    padding: 30px 40px;
+    padding: 20px 40px;
     margin-top: auto;
+    font-size: 13px;
+    color: var(--muted);
 }
 
 .footer-container {
     max-width: 1280px;
     margin: 0 auto;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    text-align: center;
-}
-
-.footer-requisites {
-    font-size: 13px;
-    color: var(--muted);
-    display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    gap: 12px;
 }
 
-.footer-requisites a {
-    color: var(--primary-dark);
+.footer-left p {
+    margin: 0;
+}
+
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-link {
+    color: var(--muted);
     text-decoration: none;
+    transition: color 0.15s ease;
 }
 
-.footer-requisites a:hover {
+.footer-link:hover {
+    color: var(--primary-dark);
     text-decoration: underline;
+}
+
+.footer-separator {
+    color: var(--border-strong);
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 720px) {
+    .site-footer {
+        padding: 20px 16px;
+    }
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
 }
