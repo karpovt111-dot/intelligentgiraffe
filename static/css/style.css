@@ -1582,23 +1582,31 @@ html[data-theme="dark"] a.user-badge:hover {
 .footer-container {
     max-width: 1280px;
     margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    /* Три колонки: левая (пустая) занимает 1fr, центр (копирайт) занимает auto, правая занимает 1fr */
+    grid-template-columns: 1fr auto 1fr; 
     align-items: center;
-    flex-wrap: wrap;
     gap: 12px;
 }
 
-.footer-left p {
+.footer-spacer {
+    /* Пустой блок для симметрии */
+    height: 1px;
+}
+
+.footer-center p {
     margin: 0;
+    text-align: center;
 }
 
 .footer-right {
     display: flex;
     align-items: center;
+    justify-content: flex-end; /* Прижимаем ссылки вправо */
     gap: 8px;
 }
 
+/* Стили для ссылок остаются прежними */
 .footer-link {
     color: var(--muted);
     text-decoration: none;
@@ -1620,7 +1628,14 @@ html[data-theme="dark"] a.user-badge:hover {
         padding: 20px 16px;
     }
     .footer-container {
+        display: flex;
         flex-direction: column;
-        text-align: center;
+        gap: 10px;
+    }
+    .footer-spacer {
+        display: none; /* Убираем пустой блок на мобильных */
+    }
+    .footer-right {
+        justify-content: center; /* На мобильных центрируем ссылки */
     }
 }
