@@ -1008,4 +1008,13 @@ def regulations(request: Request, db: Session = Depends(get_db)):
     return render_info(request, db, "Положения мероприятий",
                        "Официальные положения.", "regulations")
 
+
+@app.get("/about", response_class=HTMLResponse)
+def about_page(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    return render(request, "about.html", {
+        "current_user": user,
+        "page_title": "О нас",
+    })
+
 # https://chat.deepseek.com/share/22jvdiogf2xiy2v8jf
