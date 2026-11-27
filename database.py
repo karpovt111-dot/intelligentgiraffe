@@ -7,6 +7,9 @@ from datetime import datetime
 # Vercel автоматически добавляет DATABASE_URL или POSTGRES_URL при подключении Neon/Supabase
 DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
 
+# ВРЕМЕННАЯ СТРОКА ДЛЯ ОТЛАДКИ
+print(f"DEBUG: DATABASE_URL starts with: {DATABASE_URL[:15] if DATABASE_URL else 'NONE'}")
+
 if not DATABASE_URL:
     # Если переменная не найдена (например, при локальном запуске), 
     # можно использовать SQLite для тестов, но на Vercel это не сработает.
