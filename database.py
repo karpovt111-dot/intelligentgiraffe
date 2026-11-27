@@ -1,10 +1,27 @@
+import os
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Date, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from datetime import datetime
 
-DATABASE_URL = "sqlite:///./giraffic.db"
+# 1. Получаем URL базы данных из переменных окружения Vercel
+# Vercel автоматически добавляет DATABASE_URL или POSTGRES_URL при подключении Neon/Supabase
+DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+if not DATABASE_URL:
+    # Если переменная не найдена (например, при локальном запуске), 
+    # можно использовать SQLite для тестов, но на Vercel это не сработает.
+    print("WARNING: DATABASE_URL not found. Using SQLite for local testing.")
+    DATABASE_URL = "sqlite:///./giraffic.db"
+    # Для SQLite нужен connect_args, для PostgreSQL - нет
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    # SQLAlchemy требует префикс postgresql:// вместо postgres://
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    
+    # Создаем движок для PostgreSQL (без connect_args)
+    engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
 
@@ -78,4 +95,5 @@ class Order(Base):
 
 
 def init_db():
+    # Эта функция создаст таблицы в новой базе данных при первом запуске
     Base.metadata.create_all(bind=engine)
