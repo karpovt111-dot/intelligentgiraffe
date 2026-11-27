@@ -1568,3 +1568,39 @@ html[data-theme="dark"] a.user-badge:hover {
     color: #6ee07a;
     border-color: #2f4a33;
 }
+
+/* --- Подвал --- */
+.site-footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 30px 40px;
+    margin-top: auto;
+}
+
+.footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+}
+
+.footer-requisites {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.footer-requisites a {
+    color: var(--primary-dark);
+    text-decoration: none;
+}
+
+.footer-requisites a:hover {
+    text-decoration: underline;
+}
