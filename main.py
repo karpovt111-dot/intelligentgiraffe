@@ -33,8 +33,6 @@ import pymupdf
 BASE_DIR = Path(__file__).parent
 OLYMPIADS_DIR = BASE_DIR / "olympiads"
 COURSES_DIR = BASE_DIR / "courses"
-for d in (OLYMPIADS_DIR, COURSES_DIR):
-    d.mkdir(parents=True, exist_ok=True)
 
 FONT_PATH = BASE_DIR / "DejaVuSans.ttf"
 if FONT_PATH.exists():
