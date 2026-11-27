@@ -7,3 +7,4 @@ itsdangerous
 python-dotenv
 reportlab
 pymupdf
+psycopg2-binary
