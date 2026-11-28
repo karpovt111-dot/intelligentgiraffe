@@ -356,6 +356,7 @@ def login_post(
 ):
     email = (email or "").strip().lower()
     user = db.query(User).filter(User.email == email).first()
+    print("DEBUG: LOGIN ENDPOINT CALLED")
 
     if not user or not verify_password(password, user.password_hash):
         return render(request, "login.html", {
