@@ -325,8 +325,15 @@ def register_post(
 
     token = create_token(user.id)
     response = RedirectResponse(safe_next(next), status_code=303)
-    response.set_cookie(COOKIE_NAME, token, max_age=COOKIE_MAX_AGE,
-                        httponly=True, samesite="lax")
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        max_age=COOKIE_MAX_AGE,
+        httponly=True,
+        secure=True,          # Vercel работает по HTTPS, это обязательно
+        samesite="none",      # Разрешает кросс-сайтовые запросы (если фронт и бэк на разных поддоменах)
+        # domain=...          # УДАЛИТЕ или закомментируйте эту строку, если она есть
+    )
     return response
 
 
@@ -362,8 +369,15 @@ def login_post(
 
     token = create_token(user.id)
     response = RedirectResponse(safe_next(next), status_code=303)
-    response.set_cookie(COOKIE_NAME, token, max_age=COOKIE_MAX_AGE,
-                        httponly=True, samesite="lax")
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        max_age=COOKIE_MAX_AGE,
+        httponly=True,
+        secure=True,          # Vercel работает по HTTPS, это обязательно
+        samesite="none",      # Разрешает кросс-сайтовые запросы (если фронт и бэк на разных поддоменах)
+        # domain=...          # УДАЛИТЕ или закомментируйте эту строку, если она есть
+    )
     return response
 
 
