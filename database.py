@@ -4,25 +4,24 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from datetime import datetime
 
 # 1. Получаем URL базы данных из переменных окружения Vercel
-# Vercel автоматически добавляет DATABASE_URL или POSTGRES_URL при подключении Neon/Supabase
 DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
 
-# ВРЕМЕННАЯ СТРОКА ДЛЯ ОТЛАДКИ
+# ВРЕМЕННАЯ СТРОКА ДЛЯ ОТЛАДКИ (потом можно удалить)
 print(f"DEBUG: DATABASE_URL starts with: {DATABASE_URL[:15] if DATABASE_URL else 'NONE'}")
 
 if not DATABASE_URL:
-    # Если переменная не найдена (например, при локальном запуске), 
-    # можно использовать SQLite для тестов, но на Vercel это не сработает.
+    # Fallback для локальной разработки
     print("WARNING: DATABASE_URL not found. Using SQLite for local testing.")
     DATABASE_URL = "sqlite:///./giraffic.db"
-    # Для SQLite нужен connect_args, для PostgreSQL - нет
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
-    # SQLAlchemy требует префикс postgresql:// вместо postgres://
+    # Явно указываем драйвер psycopg2, чтобы SQLAlchemy не искала psycopg (v3)
     if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+    elif DATABASE_URL.startswith("postgresql://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
     
-    # Создаем движок для PostgreSQL (без connect_args)
+    # Создаем движок для PostgreSQL
     engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
